@@ -57,14 +57,8 @@ Default:
 Default command:	
 
 ```
-$ ./example test
-Default command executed with argument: test
-```
-
-Default command:	
-
-```
-$ ./example test
+# Command "test" does not exist, use default command
+$ ./example test 
 Default command executed with argument: test
 ```
 
