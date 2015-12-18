@@ -29,11 +29,21 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-	/* Default argument */
+	/* 
+	Default argument
+	
+	* example $test
+	Will fail to find the command with the name "test" and instead use $test as an argument.
+	 */
 	Func func = [](Args argz) { cout << "Default command executed with argument: " << argz[0] << endl; };
 	Command default_cmd("default", func, "This is the default (fallback) command.", 1);
 
-	/* Command with capture by reference */
+	/* 
+	Command with capture by reference
+	
+	* example guess $myGuess
+	Will try to match $myGuess with "secret_word" and will output the result of the guess.
+	 */
 	string secret_word = "chicken";
 	func = [&secret_word](Args argz) { 
 		string answer = (argz[0].compare(secret_word) == 0) ? "true" : "false";
@@ -41,11 +51,21 @@ int main(int argc, char** argv) {
 	};
 	Command guess("guess", func, "Guess the secret word! (HINT: It's 'chicken')", 1);
 
-	/* Command with no required arguments */
+	/* 
+	Command with no required arguments
+	
+	* example none
+	Will execute the command "none", even if there is no arguments	
+	*/
 	func = [](Args argz){ cout << "I don't care about your arguments. " << endl; };
 	Command none("none", func, "A command with no required arguments.");
 
-	/* Command with 3 required arguments */
+	/*
+	Command with 3 required arguments
+	
+	* example many $one $two $three
+	If not enough arguments (3), the command wont be executed, and it will instead output the help text of the command.
+	*/
 	func = [](Args argz){ cout << "Arguments: " << argz[0] << "\t" << argz[1] << "\t" << argz[2] << endl; };
 	Command many("many", func, "A command with 3 required arguments", 3);
 
