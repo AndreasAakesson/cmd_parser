@@ -45,7 +45,7 @@ public:
   /* For printing */
   void usage();
   void usage(const std::string&);
-  void usage(Command&);
+  void usage(const Command&);
 private:
    /* Fallback command - executed when command isnt found. */
   Command default_command_;
