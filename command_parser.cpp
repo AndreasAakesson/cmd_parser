@@ -1,6 +1,7 @@
 /**
 
 	This file is a part of cmd_parser.
+
 	Copyright 2015 Andreas Åkesson
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +18,37 @@
 
 **/
 
-
-#include "command_parser.hpp"
 #include <iostream>
 
-using namespace cmd_parser;
+#include "command_parser.hpp"
+
 using namespace std;
 
-Command CommandParser::find(const string name) {
-	for(auto c : commands) {
-		if(c.name() == name)
-			return c;
+namespace cmd_parser {
+///////////////////////////////////////////////////////////////////////////////
+void CommandParser::exec(int argc, char** argv) {
+	CommandArg args;
+
+	// Skip first argument, since it will be the name of the program
+	for(int i {1}; i < argc; ++i) {
+		args.push_back(argv[i]);
 	}
-	return defaultCommand_;
+
+	exec(args);
 }
 
-void CommandParser::exec(vector<string> args) {
+///////////////////////////////////////////////////////////////////////////////
+Command& CommandParser::find(const string& name) noexcept {
+	for(auto& command : commands_) {
+		if(command.name() == name)
+			return command;
+	}
+
+	return default_command_;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void CommandParser::exec(CommandArg& args) {
 		
 	// TODO: Make prettier, store args & make functions, use references, compare with iterators/pointers (not strings)
 	if(args.empty()) {
@@ -40,40 +56,40 @@ void CommandParser::exec(vector<string> args) {
 		return;
 	}
 
-	auto cmd = find(args[0]);
-	// if command is found, remove first arg
-	if(cmd.name() != defaultCommand_.name())
-		args.erase(args.begin());
+	decltype(auto) cmd = find(args.front());
 
-	// if not enough args
+	// If command is found, remove first arg
+	if(cmd not_eq default_command_) {
+		args.erase(args.begin());
+	}
+
+	// If not enough args
 	if(cmd.args() > args.size()) {
 		usage(cmd);
 	} else {
-		cmd.exec(args);	
+		cmd.exec(args);
 	}
 }
 
-void CommandParser::exec(int argc, char** argv) {
-	vector<string> args;
-	// Skip first argument, since it will be the name of the program
-	for(int i = 1; i < argc; i++)
-		args.push_back(argv[i]);
-
-	exec(args);
-}
-
+///////////////////////////////////////////////////////////////////////////////
 void CommandParser::usage() {
-	cout << endl << "USAGE:" << endl << endl;
-	for(auto c : commands) {
-		cout << "\t" << c << endl << endl;
+	cout << "\nUSAGE:\n\n";
+
+	for(const auto& command : commands_) {
+		cout << "\t" << command << "\n\n";
 	}
-	cout << "Default: " << endl << "\t" << defaultCommand_ << endl << endl;
+
+	cout << "Default: \n\t" << default_command_ << "\n\n";
 }
 
-void CommandParser::usage(const std::string command) {
-	cout << find(command) << endl;
+///////////////////////////////////////////////////////////////////////////////
+void CommandParser::usage(const std::string& command) {
+	cout << find(command) << '\n';
 }
 
-void CommandParser::usage(const Command c) {
-	cout << c << endl;
+///////////////////////////////////////////////////////////////////////////////
+void CommandParser::usage(Command& command) {
+	cout << command << '\n';
 }
+
+} //< namespace cmd_parser
